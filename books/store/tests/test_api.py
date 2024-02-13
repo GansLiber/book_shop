@@ -7,12 +7,33 @@ from store.serializers import BookSerializer
 
 
 class BooksApiTestCase(APITestCase):
-    def test_get(self):
-        book_1 = Book.objects.create(name='Book gg 1', price=24)
-        book_2 = Book.objects.create(name='Book gg 2', price=224)
-        url = reverse('book-list')
-        response = self.client.get(url)
-        serializer_data = BookSerializer([book_1, book_2], many=True).data
+    url_book = reverse('book-list')
+    def setUp(self):
+        self.book_1 = Book.objects.create(name='Book test 1', price=24, authtor_name='Autor 1')
+        self.book_2 = Book.objects.create(name='Book test 2 Autor 1', price=56, authtor_name='Autor 2')
+        self.book_3 = Book.objects.create(name='Book test 3', price=89, authtor_name='Autor 3')
+        self.book_4 = Book.objects.create(name='Book test 4', price=123, authtor_name='Autor 4')
 
+    def test_get(self):
+        url = self.url_book
+        response = self.client.get(url)
+        serializer_data = BookSerializer([self.book_1, self.book_2, self.book_3, self.book_4], many=True).data
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data)
+
+    def test_get_search(self):
+        url = self.url_book
+        response = self.client.get(url, data={'search': 'Autor 1'})
+        serializer_data = BookSerializer([self.book_1, self.book_2], many=True).data
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data)
+
+    def test_get_sort(self):
+        url = self.url_book
+        response = self.client.get(url, data={'ordering': 'price'})
+        serializer_data = BookSerializer([self.book_1, self.book_2, self.book_3, self.book_4], many=True).data
+        print('ff', serializer_data)
+        print('ff', response.data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data)
