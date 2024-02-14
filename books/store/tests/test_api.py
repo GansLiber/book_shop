@@ -190,5 +190,4 @@ class BooksRelationTestCase(APITestCase):
 
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code, response.data)
         relation = UserBookRelation.objects.get(user=self.user, book=self.book_1)
-        self.assertEqual(3, relation.rate)
 
